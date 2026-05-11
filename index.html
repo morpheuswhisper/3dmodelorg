@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BioPrint Clinic — 3D-печать органов</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; scroll-behavior: smooth; }
+    body { background: #f3f8fb; color: #1f2937; line-height: 1.6; }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #155e75);
+      color: white;
+      padding: 16px 8%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+    }
+
+    nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    .logo { font-size: 26px; font-weight: bold; }
+    .menu { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .menu a, .dropbtn {
+      color: white;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      padding: 10px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .menu a:hover, .dropbtn:hover { background: rgba(255,255,255,0.18); }
+
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: white;
+      min-width: 220px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.22);
+      border-radius: 12px;
+      overflow: hidden;
+      top: 45px;
+      left: 0;
+    }
+    .dropdown-content a {
+      color: #0f172a;
+      display: block;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .dropdown-content a:hover { background: #ecfeff; color: #0f766e; }
+    .dropdown:hover .dropdown-content { display: block; }
+
+    section { padding: 65px 8%; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 40px;
+      align-items: center;
+      background: linear-gradient(135deg, #ecfeff, #ffffff);
+    }
+    h1 { font-size: 46px; color: #0f172a; margin-bottom: 20px; }
+    h2 { font-size: 34px; color: #0f172a; text-align: center; margin-bottom: 30px; }
+    h3 { color: #0f766e; margin-bottom: 10px; }
+    p { margin-bottom: 15px; }
+
+    .btn {
+      display: inline-block;
+      background: #0f766e;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      margin: 6px;
+    }
+    .btn.secondary { background: #155e75; }
+    .btn.light { background: white; color: #0f766e; border: 2px solid #0f766e; }
+
+    .visual {
+      height: 310px;
+      border-radius: 24px;
+      background: radial-gradient(circle at 30% 25%, #99f6e4, transparent 28%), radial-gradient(circle at 78% 18%, #bae6fd, transparent 26%), linear-gradient(135deg, #0f766e, #155e75);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 35px rgba(0,0,0,0.2);
+    }
+    .visual::before {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border: 10px solid rgba(255,255,255,0.85);
+      border-radius: 50%;
+      top: 65px;
+      left: 50px;
+    }
+    .visual::after {
+      content: "3D BIOPRINT";
+      position: absolute;
+      right: 28px;
+      bottom: 32px;
+      color: white;
+      font-size: 29px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .print-lines {
+      position: absolute;
+      left: 80px;
+      top: 98px;
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      background: repeating-linear-gradient(0deg, white, white 4px, transparent 4px, transparent 10px);
+    }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.09);
+      transition: 0.25s;
+    }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(0,0,0,0.14); }
+    .icon {
+      height: 155px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ccfbf1, #dbeafe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 58px;
+      margin-bottom: 16px;
+    }
+
+    .tabs { text-align: center; margin-bottom: 25px; }
+    .tab-btn {
+      padding: 12px 18px;
+      border: 2px solid #0f766e;
+      background: white;
+      color: #0f766e;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 5px;
+      font-weight: bold;
+    }
+    .tab-btn:hover { background: #0f766e; color: white; }
+    .tab-content { display: none; background: white; padding: 25px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+    .tab-content.active { display: block; }
+
+    .steps .step {
+      background: white;
+      padding: 22px;
+      margin-bottom: 18px;
+      border-left: 6px solid #0f766e;
+      border-radius: 12px;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.07);
+    }
+
+    .team-card { text-align: center; }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 15px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0f766e, #67e8f9);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 42px;
+      font-weight: bold;
+    }
+
+    form {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 7px 24px rgba(0,0,0,0.1);
+      max-width: 700px;
+      margin: auto;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 15px;
+    }
+
+    .faq-item { background: white; margin-bottom: 14px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.07); overflow: hidden; }
+    .faq-question { padding: 18px; cursor: pointer; font-weight: bold; color: #0f766e; }
+    .faq-answer { display: none; padding: 0 18px 18px; }
+    .faq-item.open .faq-answer { display: block; }
+
+    .contacts { background: #0f172a; color: white; text-align: center; }
+    .contacts h2 { color: white; }
+    footer { background: #020617; color: #cbd5e1; text-align: center; padding: 20px; }
+    .top-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #0f766e;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 50%;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    @media (max-width: 850px) {
+      .hero { grid-template-columns: 1fr; }
+      h1 { font-size: 34px; }
+      .dropdown-content { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header id="top">
+    <nav>
+      <div class="logo">BioPrint Clinic</div>
+      <div class="menu">
+        <a href="#home">Главная</a>
+        <a href="#about">О клинике</a>
+        <div class="dropdown">
+          <button class="dropbtn">Услуги ▾</button>
+          <div class="dropdown-content">
+            <a href="#services">3D-модели органов</a>
+            <a href="#services">Биопечать тканей</a>
+            <a href="#services">Тестирование лекарств</a>
+            <a href="#services">Образовательные проекты</a>
+          </div>
+        </div>
+        <a href="#technology">Технология</a>
+        <a href="#team">Учёные</a>
+        <a href="#faq">FAQ</a>
+        <a href="#appointment">Запись</a>
+        <a href="#contacts">Контакты</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero" id="home">
+    <div>
+      <h1>Клиника 3D-печати органов человека</h1>
+      <p>BioPrint Clinic — учебный информационный сайт о технологиях 3D-биопечати, регенеративной медицине и создании моделей органов.</p>
+      <a href="#services" class="btn">Посмотреть услуги</a>
+      <a href="#appointment" class="btn secondary">Записаться</a>
+    </div>
+    <div class="visual"><div class="print-lines"></div></div>
+  </section>
+
+  <section id="about">
+    <h2>О клинике</h2>
+    <div class="card">
+      <p><b>BioPrint Clinic</b> — современная клиника, специализирующаяся на 3D-моделировании органов, исследовании биопечати тканей и образовательных проектах в области биотехнологий.</p>
+      <p>Главная идея клиники — показать, как цифровые технологии помогают медицине, биологии и научным исследованиям.</p>
+    </div>
+  </section>
+
+  <section id="services">
+    <h2>Услуги</h2>
+    <div class="cards">
+      <div class="card"><div class="icon">🫀</div><h3>3D-модели органов</h3><p>Создание моделей сердца, печени, почек и других органов для обучения и планирования.</p><a href="#appointment" class="btn light">Подробнее</a></div>
+      <div class="card"><div class="icon">🧫</div><h3>Биопечать тканей</h3><p>Изучение печати кожи, хрящей, сосудистых структур и клеточных каркасов.</p><a href="#appointment" class="btn light">Подробнее</a></div>
+      <div class="card"><div class="icon">💊</div><h3>Тестирование лекарств</h3><p>Использование искусственных тканей для проверки действия препаратов.</p><a href="#appointment" class="btn light">Подробнее</a></div>
+      <div class="card"><div class="icon">🧬</div><h3>Образовательные проекты</h3><p>Лекции, демонстрации и учебные материалы по биопринтингу.</p><a href="#appointment" class="btn light">Подробнее</a></div>
+    </div>
+  </section>
+
+  <section id="technology">
+    <h2>Технология</h2>
+    <div class="tabs">
+      <button class="tab-btn" onclick="openTab('tab1')">Цифровая модель</button>
+      <button class="tab-btn" onclick="openTab('tab2')">Биочернила</button>
+      <button class="tab-btn" onclick="openTab('tab3')">Печать</button>
+      <button class="tab-btn" onclick="openTab('tab4')">Созревание ткани</button>
+    </div>
+    <div id="tab1" class="tab-content active"><h3>Цифровая модель</h3><p>Сначала создаётся 3D-модель органа или ткани на основе медицинских данных и компьютерного проектирования.</p></div>
+    <div id="tab2" class="tab-content"><h3>Биочернила</h3><p>Биочернила — это специальные материалы, которые могут содержать живые клетки и вещества для их поддержки.</p></div>
+    <div id="tab3" class="tab-content"><h3>Послойная печать</h3><p>Биопринтер наносит материал слой за слоем, формируя объёмную биологическую структуру.</p></div>
+    <div id="tab4" class="tab-content"><h3>Созревание ткани</h3><p>После печати ткань помещают в специальные условия, где клетки продолжают развиваться.</p></div>
+  </section>
+
+  <section id="team">
+    <h2>Ведущие учёные</h2>
+    <div class="cards">
+      <div class="card team-card"><div class="avatar">ИИ</div><h3>Иванов Иван Иванович</h3><p><b>Главный научный руководитель</b></p><p>Специалист по регенеративной медицине и клеточным технологиям.</p></div>
+      <div class="card team-card"><div class="avatar">ПА</div><h3>Петрова Анна Сергеевна</h3><p><b>Биоинженер</b></p><p>Разрабатывает биочернила и материалы для 3D-биопечати.</p></div>
+      <div class="card team-card"><div class="avatar">СД</div><h3>Смирнов Дмитрий Олегович</h3><p><b>3D-моделлер</b></p><p>Создаёт цифровые модели органов и тканей.</p></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>Частые вопросы</h2>
+    <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Можно ли уже напечатать полноценный орган?</div><div class="faq-answer"><p>Печать сложных органов пока находится на стадии исследований, но отдельные ткани и модели уже активно используются.</p></div></div>
+    <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Что такое биочернила?</div><div class="faq-answer"><p>Это материалы для биопечати, которые могут содержать клетки и поддерживающие вещества.</p></div></div>
+    <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Где применяют 3D-модели органов?</div><div class="faq-answer"><p>Их используют в обучении, исследованиях и планировании медицинских процедур.</p></div></div>
+  </section>
+
+  <section id="appointment">
+    <h2>Запись на консультацию</h2>
+    <form>
+      <input type="text" placeholder="Ваше имя" />
+      <input type="tel" placeholder="Телефон" />
+      <select>
+        <option>Выберите услугу</option>
+        <option>3D-модель органа</option>
+        <option>Консультация по биопечати</option>
+        <option>Образовательный проект</option>
+      </select>
+      <textarea rows="4" placeholder="Комментарий"></textarea>
+      <button class="btn" type="button" onclick="alert('Заявка отправлена!')">Отправить заявку</button>
+    </form>
+  </section>
+
+  <section id="contacts" class="contacts">
+    <h2>Контакты</h2>
+    <p><b>Адрес:</b> г. Абакан, ул. Маршала Жукова, 17</p>
+    <p><b>Телефон:</b> +7 (900) 000-00-00</p>
+    <p><b>Email:</b> info@bioprint-clinic.ru</p>
+    <p><b>Режим работы:</b> Пн–Пт, 9:00–18:00</p>
+  </section>
+
+  <footer>© 2026 BioPrint Clinic. Учебный информационный сайт.</footer>
+  <a href="#top" class="top-btn">↑</a>
+
+  <script>
+    function openTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function toggleFaq(element) {
+      element.parentElement.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
